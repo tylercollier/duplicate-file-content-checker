@@ -1,8 +1,11 @@
 const dir = require('node-dir')
 const md5 = require('md5-file/promise')
 const path = require('path')
+var realFs = require('fs')
+var gracefulFs = require('graceful-fs')
+gracefulFs.gracefulify(realFs)
 
-const startDir = '/home/tylercollier/repos/duplicate-file-content-checker'
+const startDir = process.argv[2] || __dirname
 
 const files = {}
 const hashes = {}
@@ -12,9 +15,10 @@ dir.promiseFiles(startDir, null, { recursive: true })
   .then(fileList => {
     console.log('--------------------- fileList.length', fileList.length)
     let processedFileCount = 0
-    for (let [index, fileName] of fileList.entries()) {
-      console.log(`Processing #${index} of ${fileList.length}`)
+    fileList.forEach(fileName => {
       md5(fileName).then(hash => {
+        processedFileCount++
+        console.log(`Processing #${processedFileCount} of ${fileList.length}`)
         console.log(`Hash of ${fileName} is ${hash}`)
         files[fileName] = hash
         if (hashes[hash]) {
@@ -23,11 +27,12 @@ dir.promiseFiles(startDir, null, { recursive: true })
         } else {
           hashes[hash] = [fileName]
         }
-        processedFileCount++
         if (processedFileCount === fileList.length) {
           console.log('Done. Duplicates:')
           console.log(JSON.stringify(duplicates, null, 2))
+          console.log('Duplicate count: ' + duplicates.keys().length)
         }
       })
-    }
+    })
   })
+
