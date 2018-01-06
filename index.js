@@ -13,14 +13,13 @@ const files = {}
 const hashes = {}
 const duplicates = {}
 
-async.concat(directories, (d, cb) => {
-  dir.files(d, cb)
-}, (error, fileList) => {
+async.concat(directories, dir.files, (error, fileList) => {
   if (error) {
     console.log('--------------------- error', error)
     process.exit()
   }
   console.log('File list length', fileList.length)
+  fileList = fileList.slice().sort()
   let processedFileCount = 0
   fileList.forEach(fileName => {
     md5(fileName).then(hash => {
