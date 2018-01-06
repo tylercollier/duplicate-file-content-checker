@@ -9,7 +9,7 @@ const startDir = process.argv[2] || __dirname
 
 const files = {}
 const hashes = {}
-duplicates = {}
+const duplicates = {}
 
 dir.promiseFiles(startDir, null, { recursive: true })
   .then(fileList => {
@@ -30,7 +30,7 @@ dir.promiseFiles(startDir, null, { recursive: true })
         if (processedFileCount === fileList.length) {
           console.log('Done. Duplicates:')
           console.log(JSON.stringify(duplicates, null, 2))
-          console.log('Duplicate count: ' + duplicates.keys().length)
+          console.log('Duplicate count: ' + Object.keys(duplicates).length)
         }
       })
     })
